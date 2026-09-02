@@ -317,9 +317,19 @@ tr.picked{background:rgba(34,211,238,.07)!important;box-shadow:inset 3px 0 0 var
     <div class="stat"><label>Days logged</label><strong id="days">0</strong><small id="dayssub">of 7</small></div>
   </div>
 
+  <div class="selbar" id="selbar">
+    <span class="cnt"><b id="selcount">0</b> days selected</span>
+    <button data-a="fill">Fill 9&ndash;6</button>
+    <button data-a="copy">Copy first row&rsquo;s times</button>
+    <button data-a="off">Mark off</button>
+    <button data-a="clear">Clear times</button>
+    <button data-a="none" class="x">Deselect</button>
+  </div>
+
   <div class="panel">
     <table>
       <thead><tr>
+        <th style="width:44px"><label class="cb"><input type="checkbox" id="selall"><i></i></label></th>
         <th style="width:170px">Day</th><th>Time in</th><th>Lunch start</th><th>Lunch end</th><th>Time out</th>
         <th style="width:96px;text-align:right">Hours</th><th style="width:96px"></th>
       </tr></thead>
