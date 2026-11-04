@@ -128,6 +128,26 @@ textarea:focus{outline:none;border-color:var(--a2);box-shadow:0 0 0 3px rgba(34,
 .btn.ghost{background:transparent;color:var(--dim)}
 .btn svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
+
+/* quick daily schedule editor */
+.quick{margin:0 0 20px;padding:19px 21px;border:1px solid rgba(34,211,238,.27);border-radius:19px;
+  background:linear-gradient(130deg,rgba(34,211,238,.10),rgba(124,92,255,.09));}
+.quick-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.quick h2{font-family:Sora,sans-serif;font-size:17px;font-weight:600;letter-spacing:-.02em;margin:0 0 3px}
+.quick p,.quick small{font-size:12px;color:var(--dim);margin:0}
+.quick .quick-status{font-size:11.5px;color:var(--lime)}
+.quick-fields{display:flex;align-items:flex-end;flex-wrap:wrap;gap:11px}
+.quick-fields label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--dim)}
+.quick-fields input[type=time]{width:130px;border:1px solid var(--edge);background:rgba(255,255,255,.07)}
+.quick-fields input[type=time]:focus{border-color:var(--a2)}
+.quick-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.quick-actions .btn{white-space:nowrap}
+.row-tools{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+.row-default{font:inherit;font-size:10.5px;color:var(--a2);cursor:pointer;border:1px solid rgba(34,211,238,.25);
+  background:rgba(34,211,238,.07);padding:4px 8px;border-radius:8px;white-space:nowrap}
+.row-default:hover{background:rgba(34,211,238,.18)}
+@media(max-width:640px){.quick{padding:16px}.quick-fields input[type=time]{width:142px}}
+
 /* month */
 .month{margin-top:26px;background:var(--card2);border:1px solid var(--edge);border-radius:20px;padding:20px 22px;backdrop-filter:blur(14px)}
 .mhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
@@ -305,6 +325,23 @@ tr.picked{background:rgba(34,211,238,.07)!important;box-shadow:inset 3px 0 0 var
 
   <div class="banner" id="banner"></div>
 
+  <section class="quick" aria-label="Standard daily work schedule">
+    <div class="quick-head">
+      <div><h2>My standard day</h2><p>Set once for future weekdays. Edit a specific day in the table below when needed.</p></div>
+      <span class="quick-status" id="quickStatus" role="status">Autosaved</span>
+    </div>
+    <div class="quick-fields">
+      <label>Time in<input type="time" data-default="in" value="09:00"></label>
+      <label>Lunch starts<input type="time" data-default="ls" value="13:15"></label>
+      <label>Lunch ends<input type="time" data-default="le" value="13:45"></label>
+      <label>Time out<input type="time" data-default="out" value="18:00"></label>
+      <div class="quick-actions">
+        <button class="btn primary" id="applyDefault">Apply to this week</button>
+        <small>Updates Mon–Fri; keeps days marked off.</small>
+      </div>
+    </div>
+  </section>
+
   <div class="stats">
     <div class="stat hero">
       <label>Total this week</label>
@@ -319,7 +356,7 @@ tr.picked{background:rgba(34,211,238,.07)!important;box-shadow:inset 3px 0 0 var
 
   <div class="selbar" id="selbar">
     <span class="cnt"><b id="selcount">0</b> days selected</span>
-    <button data-a="fill">Fill 9&ndash;6</button>
+    <button data-a="fill">Use my standard times</button>
     <button data-a="copy">Copy first row&rsquo;s times</button>
     <button data-a="off">Mark off</button>
     <button data-a="clear">Clear times</button>
@@ -346,7 +383,7 @@ tr.picked{background:rgba(34,211,238,.07)!important;box-shadow:inset 3px 0 0 var
       <button class="btn primary" id="export"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Download this week</button>
       <button class="btn" id="exportAll"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>Download all weeks</button>
       <button class="btn" id="copyPrev"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy last week</button>
-      <button class="btn" id="fillWeekday"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Fill Mon&ndash;Fri 9&ndash;6</button>
+      <button class="btn" id="fillWeekday"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>Apply standard times (Mon&ndash;Fri)</button>
       <button class="btn" id="share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Copy share link</button>
       <button class="btn ghost" id="import"><svg viewBox="0 0 24 24"><path d="M12 21V9m0 0 4 4m-4-4-4 4"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>Import from Excel</button>
       <input type="file" id="file" accept=".xlsx" hidden>
@@ -357,7 +394,7 @@ tr.picked{background:rgba(34,211,238,.07)!important;box-shadow:inset 3px 0 0 var
   <section class="bulk">
     <div class="mhead">
       <h2>Bulk fill</h2>
-      <span>9:00&ndash;18:00 &middot; lunch 1:30&ndash;2:30 &middot; weekends and holidays skipped</span>
+      <span>Uses your saved standard day &middot; weekends and holidays skipped</span>
     </div>
     <div class="brow">
       <button class="preset" data-p="week">This week</button>
@@ -399,14 +436,14 @@ tr.picked{background:rgba(34,211,238,.07)!important;box-shadow:inset 3px 0 0 var
 
   <div class="foot">
     <span id="status">Loading&hellip;</span>
-    <span>Autosaved in this browser &middot; new weeks pre-filled 9:00&ndash;18:00 with a 13:30&ndash;14:30 lunch</span>
+    <span>Autosaved on this device &middot; future weekdays use your standard times &middot; existing entries are preserved</span>
   </div>
 </div>
 <script>
 const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const DEF={in:'09:00',ls:'13:30',le:'14:30',out:'18:00'};
+let DEF={in:'09:00',ls:'13:15',le:'13:45',out:'18:00'};
 const $=id=>document.getElementById(id);
-let monday, week={}, saveTimer=null, SEL=new Set();
+let monday, week={}, saveTimer=null, pendingSave=null, SEL=new Set();
 
 const iso=d=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return x.toISOString().slice(0,10);};
 function mondayOf(d){const x=new Date(d);const k=(x.getDay()+6)%7;x.setHours(0,0,0,0);x.setDate(x.getDate()-k);return x;}
@@ -417,6 +454,20 @@ function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.get
   return {week:Math.ceil(((t-y)/864e5+1)/7),year:t.getUTCFullYear()};}
 const fmt=d=>d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
 const key=m=>'ts:'+iso(m);
+const toMinutes=t=>{const [h,m]=t.split(':').map(Number);return h*60+m;};
+function validSchedule(d){
+  return ['in','ls','le','out'].every(k=>/^([01]\d|2[0-3]):[0-5]\d$/.test(d[k]||'')) &&
+    toMinutes(d.in)<toMinutes(d.ls) && toMinutes(d.ls)<toMinutes(d.le) &&
+    toMinutes(d.le)<toMinutes(d.out);
+}
+async function loadDefaultSchedule(){
+  try{
+    const r=await window.storage.get('ts:defaults');
+    const stored=JSON.parse(r.value);
+    if(stored&&validSchedule(stored)) DEF=Object.assign({},DEF,stored);
+  }catch(e){}
+  document.querySelectorAll('[data-default]').forEach(x=>{x.value=DEF[x.dataset.default];});
+}
 
 function blankWeek(m){return {start:iso(m),comment:'',
   days:DAYS.map(function(_,i){
@@ -444,16 +495,50 @@ function flag(msg,cls){
     $('pilltext').textContent = cls==='err' ? 'Not saved' : (cls==='busy' ? msg : 'Saved');
   }
 }
-async function save(){
+async function flushSave(){
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(async()=>{
-    try{
-      await window.storage.set(key(monday),JSON.stringify(week));
-      await window.storage.set('ts:name',$('name').value);
-      flag('Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),'saved');
-    }catch(e){flag('Could not save — changes are on screen only','err');}
-  },350);
+  if(!pendingSave) return;
+  const job=pendingSave; pendingSave=null;
+  try{
+    await window.storage.set(job.key,job.data);
+    await window.storage.set('ts:name',job.name);
+    flag('Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),'saved');
+  }catch(e){flag('Could not save — changes are on screen only','err');}
 }
+function save(){
+  // Capture this week now, so navigating while autosave is pending never writes to another week.
+  pendingSave={key:key(monday),data:JSON.stringify(week),name:$('name').value};
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(flushSave,350);
+  flag('Saving…','busy');
+}
+document.querySelectorAll('[data-default]').forEach(function(inp){
+  inp.addEventListener('change',async function(){
+    const next=Object.assign({},DEF,{[inp.dataset.default]:inp.value});
+    if(!validSchedule(next)){
+      inp.value=DEF[inp.dataset.default];
+      $('quickStatus').textContent='Check the order of your times';
+      return flag('Start, lunch and finish must be in order','err');
+    }
+    DEF=next;
+    $('quickStatus').textContent='Saving…';
+    try{
+      await window.storage.set('ts:defaults',JSON.stringify(DEF));
+      $('quickStatus').textContent='Standard times saved';
+      flag('Standard day saved for new weeks','saved');
+    }catch(e){
+      $('quickStatus').textContent='Could not save';
+      flag('Could not save standard times','err');
+    }
+  });
+});
+function applyStandardWeek(){
+  week.days.forEach((d,i)=>{
+    if(i<5&&!d.off&&!HOL[iso(addDays(monday,i))]) Object.assign(d,DEF);
+  });
+  render(); save();
+}
+$('applyDefault').onclick=applyStandardWeek;
 
 function stepperCell(i,f,v,off){
   return '<td><div class="tp'+(off?' dis':'')+'">'+
@@ -481,7 +566,8 @@ function render(){
       '<td class="day"><strong'+(hol?' data-hol="'+hol.name.replace(/"/g,'')+'"':'')+'>'+DAYS[i]+'</strong><em>'+fmt(date)+'</em></td>'+
       ['in','ls','le','out'].map(f=>stepperCell(i,f,d[f],d.off)).join('')+
       '<td class="hrs"></td>'+
-      '<td><label class="sw"><input type="checkbox" data-i="'+i+'" data-f="off"'+(d.off?' checked':'')+'><i></i>off</label></td>';
+      '<td><div class="row-tools"><label class="sw"><input type="checkbox" data-i="'+i+'" data-f="off"'+(d.off?' checked':'')+'><i></i>off</label>'+
+       '<button type="button" class="row-default" data-reset="'+i+'" title="Set this day to your standard times">↺ Default</button></div></td>';
     tb.appendChild(tr);
     paintRow(i);
   });
@@ -565,12 +651,20 @@ $('rows').addEventListener('input',function(e){
   }
   updateStats(); save();
 });
+// One-click per-day reset to the current standard schedule
+$('rows').addEventListener('click',function(e){
+  const btn=e.target.closest('button[data-reset]'); if(!btn) return;
+  const i=+btn.dataset.reset;
+  if(HOL[iso(addDays(monday,i))]) return flag('This is a holiday; turn off the off switch first if you worked','err');
+  Object.assign(week.days[i],DEF,{off:false});
+  render(); save();
+});
 // up / down steppers: 15 min a click, hold to repeat
-const STEP_SEED={in:'09:00',ls:'13:30',le:'14:30',out:'18:00'};
+
 function bump(i,f,dir){
   const d=week.days[i]; if(d.off) return;
   let v=d[f];
-  if(!v){ d[f]=STEP_SEED[f]; }
+  if(!v){ d[f]=DEF[f]; }
   else{
     const p=v.split(':'); let m=(+p[0]*60 + +p[1]) + dir*15;
     m=((m%1440)+1440)%1440;
@@ -594,13 +688,13 @@ window.addEventListener('blur',stopHold);
 $('comment').addEventListener('input',function(e){week.comment=e.target.value;save();});
 $('name').addEventListener('input',save);
 
-async function go(m){monday=m;week=await load(m);SEL=new Set();render();updateSelBar();}
+async function go(m){await flushSave();monday=m;week=await load(m);SEL=new Set();render();updateSelBar();}
 const go2=go;
 $('prev').onclick=()=>go(addDays(monday,-7));
 $('next').onclick=()=>go(addDays(monday,7));
 $('thisweek').onclick=()=>go(mondayOf(new Date()));
 $('clear').onclick=()=>{week={start:iso(monday),comment:'',days:DAYS.map(()=>({in:'',ls:'',le:'',out:'',off:false}))};render();save();};
-$('fillWeekday').onclick=()=>{week.days.forEach((d,i)=>{if(i<5&&!d.off)Object.assign(d,DEF);});render();save();};
+$('fillWeekday').onclick=applyStandardWeek;
 $('copyPrev').onclick=async()=>{
   const p=await load(addDays(monday,-7));
   week.days=p.days.map(d=>Object.assign({},d));
@@ -751,6 +845,7 @@ document.querySelectorAll('.preset').forEach(function(btn){
   };
 });
 $('bfill').onclick=async function(){
+  await flushSave();
   const a=$('bfrom').value, b=$('bto').value;
   if(!a||!b) return flag('Pick a start and end date first','err');
   if(a>b) return flag('The start date is after the end date','err');
@@ -869,6 +964,7 @@ function openShared(){
 (async function(){
   try{const n=await window.storage.get('ts:name'); if(n) $('name').value=n.value;}catch(e){}
   await loadHolidays();
+  await loadDefaultSchedule();
   if(!openShared()) await go(mondayOf(new Date()));
   const n=new Date();
   setRange(new Date(n.getFullYear(),n.getMonth(),1),new Date(n.getFullYear(),n.getMonth()+1,0));
