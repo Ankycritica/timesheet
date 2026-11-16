@@ -563,7 +563,8 @@ function render(){
     tr.dataset.row=i;
     tr.innerHTML=
       '<td><label class="cb"><input type="checkbox" data-i="'+i+'" data-f="sel"'+(SEL.has(i)?' checked':'')+'><i></i></label></td>'+
-      '<td class="day"><strong'+(hol?' data-hol="'+hol.name.replace(/"/g,'')+'"':'')+'>'+DAYS[i]+'</strong><em>'+fmt(date)+'</em></td>'+
+      '<td class="day"><strong'+(hol?' data-hol="'+hol.name.replace(/"/g,'')+'"':'')+'>'+DAYS[i]+'</strong><em>'+fmt(date)+'</em>'+
+      '<button type="button" class="row-default worked-day" data-work="'+i+'"'+(d.off?'':' hidden')+'>I worked</button></td>'+
       ['in','ls','le','out'].map(f=>stepperCell(i,f,d[f],d.off)).join('')+
       '<td class="hrs"></td>'+
       '<td><div class="row-tools"><label class="sw"><input type="checkbox" data-i="'+i+'" data-f="off"'+(d.off?' checked':'')+'><i></i>off</label>'+
@@ -583,6 +584,7 @@ function paintRow(i){
     inp.disabled=!!d.off;
     inp.parentNode.classList.toggle('dis',!!d.off);
   });
+  const worked=tr.querySelector('[data-work]'); if(worked) worked.hidden=!d.off;
   const cell=tr.querySelector('.hrs');
   cell.className='hrs '+(h?'':'zero');
   cell.innerHTML = h ? '<b>'+h.toFixed(2)+'</b>' : '\u2014';
@@ -651,11 +653,18 @@ $('rows').addEventListener('input',function(e){
   }
   updateStats(); save();
 });
+// Reopen any off day without overwriting times already entered.
+$('rows').addEventListener('click',function(e){
+  const btn=e.target.closest('button[data-work]'); if(!btn) return;
+  const i=+btn.dataset.work, d=week.days[i];
+  if(!['in','ls','le','out'].some(f=>d[f])) Object.assign(d,DEF);
+  d.off=false;
+  render(); save();
+});
 // One-click per-day reset to the current standard schedule
 $('rows').addEventListener('click',function(e){
   const btn=e.target.closest('button[data-reset]'); if(!btn) return;
   const i=+btn.dataset.reset;
-  if(HOL[iso(addDays(monday,i))]) return flag('This is a holiday; turn off the off switch first if you worked','err');
   Object.assign(week.days[i],DEF,{off:false});
   render(); save();
 });
@@ -860,7 +869,7 @@ $('bfill').onclick=async function(){
       if(day<from||day>to) continue;
       const d=w.days[i];
       if(i>4){ skipped++; continue; }
-      if(HOL[iso(day)]){ if(!d.off){d.off=true;touched=true;} skipped++; continue; }
+      if(HOL[iso(day)]){ skipped++; continue; }
       if(d.off){ skipped++; continue; }
       const hasTimes=d.in||d.out;
       if(hasTimes&&!over){ skipped++; continue; }
